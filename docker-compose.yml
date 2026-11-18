@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: checkout_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: checkout_db
+      MYSQL_USER: checkout_user
+      MYSQL_PASSWORD: checkout_password
+    ports:
+      - "3307:3306" # O MySQL do seu PC agora responde na 3307
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: checkout_pma
+    restart: always
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "8085:80" # phpMyAdmin movido para a porta 8085
+    depends_on:
+      - db
+
+  backend:
+    build: ./backend
+    container_name: checkout_node
+    restart: always
+    environment:
+      - DB_HOST=db
+      - DB_USER=checkout_user
+      - DB_PASSWORD=checkout_password
+      - DB_NAME=checkout_db
+      - PORT=3000
+    ports:
+      - "3005:3000" # API do Node.js movida para a porta 3005
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - db
+    env_file:
+      - .env
+
+  frontend:
+    image: nginx:alpine
+    container_name: checkout_nginx
+    restart: always
+    ports:
+      - "8090:80" # Nginx (Frontend) movido para a porta 8090
+    volumes:
+      - ./front:/usr/share/nginx/html
+
+volumes:
+  db_data:

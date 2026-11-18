@@ -1,0 +1,11 @@
+{
+  "name": "checkout-backend",
+  "version": "1.0.0",
+  "main": "server.js",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "mercadopago": "^2.0.9",
+    "mysql2": "^3.9.7"
+  }
+}
