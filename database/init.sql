@@ -27,3 +27,11 @@ CREATE TABLE IF NOT EXISTS pedidos_itens (
 INSERT INTO produtos (nome, preco, imagem_url) VALUES
 ('Teclado Mecânico Custom', 350.00, 'https://via.placeholder.com/150'),
 ('Mouse Gamer Sem Fio', 200.00, 'https://via.placeholder.com/150');
+
+UPDATE produtos 
+SET imagem_url = 'https://images.unsplash.com/photo-1595225476474-87563907a212?auto=format&fit=crop&w=600&q=80' 
+WHERE id = 1;
+
+UPDATE produtos 
+SET imagem_url = 'https://images.unsplash.com/photo-1527814050087-3793815479db?auto=format&fit=crop&w=600&q=80' 
+WHERE id = 2;
