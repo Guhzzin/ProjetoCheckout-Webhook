@@ -75,31 +75,3 @@ sequenceDiagram
     Back->>MP: GET /v1/payments/{id} (valida status oficial)
     MP-->>Back: Confirma status: approved
     Back->>DB: UPDATE pedidos SET status = 'aprovado', transacao_id = {id}
-
-    ##  Modelo Lógico do Banco de Dados (DER)
-    erDiagram
-    PRODUTOS {
-        int id PK
-        varchar nome
-        decimal preco
-        varchar imagem_url
-    }
-
-    PEDIDOS {
-        int id PK
-        decimal total
-        varchar status
-        varchar transacao_id
-        timestamp criado_em
-    }
-
-    PEDIDOS_ITENS {
-        int id PK
-        int pedido_id FK
-        int produto_id FK
-        int quantidade
-        decimal preco_unitario
-    }
-
-    PEDIDOS ||--|{ PEDIDOS_ITENS : "contém"}
-    PRODUTOS ||--o{ PEDIDOS_ITENS : "compõe"}
