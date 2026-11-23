@@ -65,6 +65,7 @@ sequenceDiagram
     participant MP as Mercado Pago (Checkout Pro)
     participant Tunel as Túnel HTTPS (ngrok)
 
+    Cliente->>Front: Seleciona produtos no carrinho e clica em Finalizar
     Front->>Back: POST /checkout (IDs e quantidades)
     Back->>DB: Consulta preços reais dos produtos
     Back->>DB: Cria pedido (status: pendente) e itens
