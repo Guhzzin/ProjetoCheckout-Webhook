@@ -51,12 +51,7 @@ Loja fictícia full-stack com carrinho de compras e integração ao **Mercado Pa
 | `POST` | `/checkout` | Cria pedido (`pendente`) e gera link do Mercado Pago |
 | `POST` | `/webhook/mercadopago` | Recebe notificação do MP e atualiza o pedido no banco |
 
-
----
-
-##  Arquitetura e Fluxo de Pagamento
-
-```mermaid
+# Arquitetura
 sequenceDiagram
     actor Cliente
     participant Front as Frontend (Nginx :8090)
@@ -81,6 +76,7 @@ sequenceDiagram
     MP-->>Back: Confirma status: approved
     Back->>DB: UPDATE pedidos SET status = 'aprovado', transacao_id = {id}
 
+    ##  Modelo Lógico do Banco de Dados (DER)
     erDiagram
     PRODUTOS {
         int id PK
@@ -105,5 +101,5 @@ sequenceDiagram
         decimal preco_unitario
     }
 
-    PEDIDOS ||--|{ PEDIDOS_ITENS : "contém"
-    PRODUTOS ||--o{ PEDIDOS_ITENS : "compõe"
+    PEDIDOS ||--|{ PEDIDOS_ITENS : "contém"}
+    PRODUTOS ||--o{ PEDIDOS_ITENS : "compõe"}
