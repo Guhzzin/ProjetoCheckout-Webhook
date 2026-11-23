@@ -50,3 +50,59 @@ Loja fictícia full-stack com carrinho de compras e integração ao **Mercado Pa
 | `GET` | `/pedidos` | Lista pedidos e status atualizados |
 | `POST` | `/checkout` | Cria pedido (`pendente`) e gera link do Mercado Pago |
 | `POST` | `/webhook/mercadopago` | Recebe notificação do MP e atualiza o pedido no banco |
+
+
+---
+
+##  Arquitetura e Fluxo de Pagamento
+
+```mermaid
+sequenceDiagram
+    actor Cliente
+    participant Front as Frontend (Nginx :8090)
+    participant Back as Backend (Node.js :3005)
+    participant DB as MySQL (:3307)
+    participant MP as Mercado Pago (Checkout Pro)
+    participant Tunel as Túnel HTTPS (ngrok)
+
+    Front->>Back: POST /checkout (IDs e quantidades)
+    Back->>DB: Consulta preços reais dos produtos
+    Back->>DB: Cria pedido (status: pendente) e itens
+    Back->>MP: Cria preferência de pagamento (com notification_url)
+    MP-->>Back: Retorna init_point (link de checkout)
+    Back-->>Front: Retorna link de pagamento
+    Front->>MP: Redireciona cliente para o Checkout Pro
+    Cliente->>MP: Efetua pagamento (Cartão/Saldo de Teste)
+    MP-->>Front: Redireciona para ?status=sucesso
+    MP->>Tunel: POST /webhook/mercadopago (notificação assíncrona)
+    Tunel->>Back: Encaminha Webhook para localhost:3005
+    Back->>MP: GET /v1/payments/{id} (valida status oficial)
+    MP-->>Back: Confirma status: approved
+    Back->>DB: UPDATE pedidos SET status = 'aprovado', transacao_id = {id}
+
+    erDiagram
+    PRODUTOS {
+        int id PK
+        varchar nome
+        decimal preco
+        varchar imagem_url
+    }
+
+    PEDIDOS {
+        int id PK
+        decimal total
+        varchar status
+        varchar transacao_id
+        timestamp criado_em
+    }
+
+    PEDIDOS_ITENS {
+        int id PK
+        int pedido_id FK
+        int produto_id FK
+        int quantidade
+        decimal preco_unitario
+    }
+
+    PEDIDOS ||--|{ PEDIDOS_ITENS : "contém"
+    PRODUTOS ||--o{ PEDIDOS_ITENS : "compõe"
